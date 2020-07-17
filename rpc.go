@@ -1,1 +1,144 @@
 package main
+
+import (
+	"context"
+	"io"
+
+	pb "github.com/alessioVnt/frontend/pb"
+)
+
+//User service RPCs
+
+func (fe *frontendServer) getUserByID(ctx context.Context, id int32) {
+	user, err := pb.NewSdccUserServiceClient(fe.userSvcConn).
+		FindByID(ctx, &pb.IDMessage{
+			Id: id,
+		})
+	if err != nil {
+		print("Error in getting user")
+		return
+	}
+	print("User found!" + "\n")
+	userName := user.Username
+	userAddress := user.Address
+	userMail := user.Mail
+	print(userName + "\n")
+	print(userAddress + "\n")
+	print(userMail + "\n")
+}
+
+//Restaurant service RPCs
+
+func (fe *frontendServer) getAllRestaurants(ctx context.Context) {
+	restaurants, err := pb.NewRestaurantServiceClient(fe.restaurantSvcConn).
+		GetAllRestaurants(ctx, &pb.RestaurantsRequest{
+			Message: "prova",
+		})
+	if err != nil {
+		print("Can't get restaurants list")
+		return
+	}
+	for {
+		restaurant, err := restaurants.Recv()
+		if err == io.EOF {
+			return
+		}
+		print(restaurant.String() + "\n")
+	}
+}
+
+func (fe *frontendServer) addRestaurant(ctx context.Context, name string, city string, address string, tags *pb.TAG) {
+	response, err := pb.NewRestaurantServiceClient(fe.restaurantSvcConn).
+		AddRestaurant(ctx, &pb.AddRestaurantRequest{
+			Name:    name,
+			City:    city,
+			Address: address,
+			TAG:     tags,
+		})
+	if err != nil {
+		print("Error in adding restaurant")
+		return
+	}
+	print(response)
+}
+
+//Mail service handlers
+
+func (fe *frontendServer) getUserMail(ctx context.Context, id int32) string {
+	response, err := pb.NewSdccMailServiceClient(fe.mailSvcConn).
+		GetUserMail(ctx, &pb.IDMessage{
+			Id: id,
+		})
+
+	if err != nil {
+		print("error in getting user mail")
+		return ""
+	}
+
+	return response.Mail
+}
+
+func (fe *frontendServer) sendMail(ctx context.Context) {
+
+}
+
+//Recommendation service handlers
+
+func (fe *frontendServer) getRecommendations(ctx context.Context, id string) []string {
+	response, err := pb.NewRecommendationServiceClient(fe.recommendationSvcConn).
+		GetRecommendations(ctx, &pb.GetRecommendationsRequest{
+			UserID: id,
+		})
+
+	if err != nil {
+		print("Error getting recommendations for user")
+		return nil
+	}
+
+	for rec := range response.RecommendationList {
+		print(rec)
+	}
+
+	return response.RecommendationList
+}
+
+//Order service handlers
+
+func (fe *frontendServer) getOrder(ctx context.Context, id string) pb.Cart {
+	order, err := pb.NewOrderServiceClient(fe.orderSvcConn).
+		GetCart(ctx, &pb.GetCartRequest{
+			UserId: id,
+		})
+
+	if err != nil {
+		print("error in getting user order")
+		return pb.Cart{}
+	}
+
+	return *order
+}
+
+func (fe *frontendServer) emptyCart(ctx context.Context, id string) {
+	_, err := pb.NewOrderServiceClient(fe.orderSvcConn).
+		EmptyCart(ctx, &pb.EmptyCartRequest{
+			UserId: id,
+		})
+
+	if err != nil {
+		print("error in emptying user order")
+		return
+	}
+	print("order succesfully cleared \n")
+	return
+
+}
+
+func (fe *frontendServer) addToCart(ctx context.Context) {
+
+}
+
+//Checkout service handlers
+
+func (fe *frontendServer) executeCheckout(ctx context.Context) {
+
+}

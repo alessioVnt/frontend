@@ -21,6 +21,15 @@ type frontendServer struct {
 
 	userSvcAddr string
 	userSvcConn *grpc.ClientConn
+
+	mailSvcAddr string
+	mailSvcConn *grpc.ClientConn
+
+	recommendationSvcAddr string
+	recommendationSvcConn *grpc.ClientConn
+
+	orderSvcAddr string
+	orderSvcConn *grpc.ClientConn
 }
 
 func main() {
@@ -45,9 +54,15 @@ func main() {
 	svc := new(frontendServer)
 	mustMapEnv(&svc.restaurantSvcAddr, "RESTAURANT_SERVICE_ADDR")
 	mustMapEnv(&svc.userSvcAddr, "USER_SERVICE_ADDR")
+	mustMapEnv(&svc.mailSvcAddr, "MAIL_SERVICE_ADDR")
+	mustMapEnv(&svc.recommendationSvcAddr, "RECOMMENDATION_SERVICE_ADDR")
+	mustMapEnv(&svc.orderSvcAddr, "CART_SERVICE_ADDR")
 
 	mustConnGRPC(ctx, &svc.restaurantSvcConn, svc.restaurantSvcAddr)
 	mustConnGRPC(ctx, &svc.userSvcConn, svc.userSvcAddr)
+	mustConnGRPC(ctx, &svc.mailSvcConn, svc.mailSvcAddr)
+	mustConnGRPC(ctx, &svc.recommendationSvcConn, svc.recommendationSvcAddr)
+	mustConnGRPC(ctx, &svc.orderSvcConn, svc.orderSvcAddr)
 
 	r := mux.NewRouter()
 	r.HandleFunc("/restaurants", svc.restaurantListHandler).Methods(http.MethodGet, http.MethodHead)
@@ -64,7 +79,14 @@ func mustMapEnv(target *string, envKey string) {
 	v := os.Getenv(envKey)
 	if v == "" {
 		// panic(fmt.Sprintf("environment variable %q not set", envKey))
-		v = "localhost:50051"
+		//TEMPORANEO
+		if envKey == "RESTAURANT_SERVICE_ADDR" {
+			v = "localhost:50051"
+		}
+		if envKey == "USER_SERVICE_ADDR" {
+			//DA CONTROLLARE
+			v = "localhost:50051"
+		}
 	}
 	*target = v
 }
