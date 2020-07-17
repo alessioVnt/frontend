@@ -6,6 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 )
 
 type platformDetails struct {
@@ -14,6 +15,27 @@ type platformDetails struct {
 }
 
 //User service handlers
+
+func (fe *frontendServer) getUserByIDHandler(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.ParseInt(r.FormValue("id"), 10, 32)
+	id32 := int32(id)
+
+	user, err := pb.NewSdccUserServiceClient(fe.userSvcConn).
+		FindByID(r.Context(), &pb.IDMessage{
+			Id: id32,
+		})
+	if err != nil {
+		print("Error in getting user")
+		return
+	}
+	print("User found!" + "\n")
+	userName := user.Username
+	userAddress := user.Address
+	userMail := user.Mail
+	print(userName + "\n")
+	print(userAddress + "\n")
+	print(userMail + "\n")
+}
 
 //Restaurant service handlers
 
@@ -73,8 +95,32 @@ func (fe *frontendServer) addRestaurantHandler(w http.ResponseWriter, r *http.Re
 
 //Mail service handlers
 
+func (fe *frontendServer) sendMailHandler(w http.ResponseWriter, r *http.Request) {
+
+}
+
 //Recommendation service handlers
+
+func (fe *frontendServer) getRecommendationsHandler(w http.ResponseWriter, r *http.Request) {
+
+}
 
 //Cart service handlers
 
+func (fe *frontendServer) getCartHandler(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func (fe *frontendServer) emptyCartHandler(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func (fe *frontendServer) addToCartHandler(w http.ResponseWriter, r *http.Request) {
+
+}
+
 //Checkout service handlers
+
+func (fe *frontendServer) checkoutRequestHandler(w http.ResponseWriter, r *http.Request) {
+
+}

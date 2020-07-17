@@ -18,6 +18,9 @@ const (
 type frontendServer struct {
 	restaurantSvcAddr string
 	restaurantSvcConn *grpc.ClientConn
+
+	userSvcAddr string
+	userSvcConn *grpc.ClientConn
 }
 
 func main() {
@@ -41,12 +44,15 @@ func main() {
 	addr := os.Getenv("LISTEN_ADDR")
 	svc := new(frontendServer)
 	mustMapEnv(&svc.restaurantSvcAddr, "RESTAURANT_SERVICE_ADDR")
+	mustMapEnv(&svc.userSvcAddr, "USER_SERVICE_ADDR")
 
 	mustConnGRPC(ctx, &svc.restaurantSvcConn, svc.restaurantSvcAddr)
+	mustConnGRPC(ctx, &svc.userSvcConn, svc.userSvcAddr)
 
 	r := mux.NewRouter()
 	r.HandleFunc("/restaurants", svc.restaurantListHandler).Methods(http.MethodGet, http.MethodHead)
 	r.HandleFunc("/addRestaurant", svc.addRestaurantHandler).Methods(http.MethodPost)
+	r.HandleFunc("/getUser", svc.getUserByIDHandler).Methods(http.MethodGet)
 
 	var handler http.Handler = r
 
