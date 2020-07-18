@@ -30,6 +30,9 @@ type frontendServer struct {
 
 	orderSvcAddr string
 	orderSvcConn *grpc.ClientConn
+
+	checkoutSvcAddr string
+	checkoutSvcConn *grpc.ClientConn
 }
 
 func main() {
@@ -57,12 +60,14 @@ func main() {
 	mustMapEnv(&svc.mailSvcAddr, "MAIL_SERVICE_ADDR")
 	mustMapEnv(&svc.recommendationSvcAddr, "RECOMMENDATION_SERVICE_ADDR")
 	mustMapEnv(&svc.orderSvcAddr, "CART_SERVICE_ADDR")
+	mustMapEnv(&svc.checkoutSvcAddr, "CHECKOUT_SERVICE_ADDR")
 
 	mustConnGRPC(ctx, &svc.restaurantSvcConn, svc.restaurantSvcAddr)
 	mustConnGRPC(ctx, &svc.userSvcConn, svc.userSvcAddr)
 	mustConnGRPC(ctx, &svc.mailSvcConn, svc.mailSvcAddr)
 	mustConnGRPC(ctx, &svc.recommendationSvcConn, svc.recommendationSvcAddr)
 	mustConnGRPC(ctx, &svc.orderSvcConn, svc.orderSvcAddr)
+	mustConnGRPC(ctx, &svc.checkoutSvcConn, svc.checkoutSvcAddr)
 
 	r := mux.NewRouter()
 	r.HandleFunc("/restaurants", svc.restaurantListHandler).Methods(http.MethodGet, http.MethodHead)

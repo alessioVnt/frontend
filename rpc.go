@@ -133,12 +133,36 @@ func (fe *frontendServer) emptyCart(ctx context.Context, id string) {
 
 }
 
-func (fe *frontendServer) addToCart(ctx context.Context) {
+func (fe *frontendServer) addToCart(ctx context.Context, userID string, restaurantID string, itemToAdd *pb.CartItem) {
+	_, err := pb.NewOrderServiceClient(fe.orderSvcConn).
+		AddItem(ctx, &pb.AddItemRequest{
+			UserId:       userID,
+			RestaurantId: restaurantID,
+			Item:         itemToAdd,
+		})
 
+	if err != nil {
+		print("Error in adding item to order \n")
+		return
+	}
 }
 
 //Checkout service handlers
 
-func (fe *frontendServer) executeCheckout(ctx context.Context) {
+func (fe *frontendServer) executeCheckout(ctx context.Context, userID string, restaurantID string, menuItems []*pb.MenuItem, cardNumber string, cvc string, expiration string) bool {
+	response, err := pb.NewCheckoutServiceClient(fe.checkoutSvcConn).
+		ExecuteTransaction(ctx, &pb.TransactionInfo{
+			UserID:         userID,
+			RestaurantID:   restaurantID,
+			Items:          menuItems,
+			CardNumber:     cardNumber,
+			Cvc:            cvc,
+			CardExpiration: expiration,
+		})
 
+	if err != nil {
+		print("Error in executing transaction \n")
+		return false
+	}
+	return response.IsSuccessful
 }
