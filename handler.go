@@ -135,5 +135,51 @@ func (fe *frontendServer) addToCartHandler(w http.ResponseWriter, r *http.Reques
 //Checkout service handlers
 
 func (fe *frontendServer) checkoutRequestHandler(w http.ResponseWriter, r *http.Request) {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		print("error in reading body of http message")
+	}
 
+	var result map[string]interface{}
+	json.Unmarshal([]byte(body), &result)
+
+	userID := result["userid"].(string)
+	restaurantID := result["restaurantid"].(string)
+
+	menuItemsJSN := result["menuitems"].(map[string]interface{})
+	var menuItems []*pb.MenuItem
+
+	for _, value := range menuItemsJSN {
+
+		item := value.(map[string]interface{})
+
+		productid := item["productid"].(string)
+
+		//Converting quantity to in32 from string
+		quantity64, _ := strconv.ParseInt(item["quantity"].(string), 10, 32)
+		quantity := int32(quantity64)
+
+		//Converting price to float32 from string
+		price64, _ := strconv.ParseFloat(item["price"].(string), 32)
+		price := float32(price64)
+
+		toAdd := &pb.MenuItem{
+			ProductId: productid,
+			Quantity:  quantity,
+			Price:     price,
+		}
+		menuItems = append(menuItems, toAdd)
+	}
+
+	cardNumber := result["cardnumber"].(string)
+	cvc := result["cvc"].(string)
+	expiration := result["expiration"].(string)
+
+	transactionResult := fe.executeCheckout(r.Context(), userID, restaurantID, menuItems, cardNumber, cvc, expiration)
+
+	if transactionResult {
+		print("Transaction successfull!")
+	} else {
+		print("Transaction failed!")
+	}
 }

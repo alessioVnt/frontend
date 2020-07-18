@@ -73,7 +73,11 @@ func main() {
 	r.HandleFunc("/restaurants", svc.restaurantListHandler).Methods(http.MethodGet, http.MethodHead)
 	r.HandleFunc("/addRestaurant", svc.addRestaurantHandler).Methods(http.MethodPost)
 	r.HandleFunc("/getUser", svc.getUserByIDHandler).Methods(http.MethodGet)
-
+	r.HandleFunc("/getRecommendations", svc.getRecommendationsHandler).Methods(http.MethodGet)
+	r.HandleFunc("/getOrder", svc.getOrderHandler).Methods(http.MethodGet)
+	r.HandleFunc("/emptyCart", svc.emptyCartHandler).Methods(http.MethodPost)
+	r.HandleFunc("/addItemToOrder", svc.addToCartHandler).Methods(http.MethodPost)
+	r.HandleFunc("/checkout", svc.checkoutRequestHandler).Methods(http.MethodPost)
 	var handler http.Handler = r
 
 	log.Infof("starting server on " + addr + ":" + srvPort)
