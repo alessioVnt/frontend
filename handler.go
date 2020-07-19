@@ -55,10 +55,12 @@ func (fe *frontendServer) addRestaurantHandler(w http.ResponseWriter, r *http.Re
 }
 
 //Mail service handlers
-//ToDo: sistemare il mail service, problema con le grpc
 
 func (fe *frontendServer) sendMailHandler(w http.ResponseWriter, r *http.Request) {
+	id := r.FormValue("id")
+	tag := r.FormValue("tag")
 
+	fe.sendMail(r.Context(), tag, id)
 }
 
 //Recommendation service handlers

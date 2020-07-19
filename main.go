@@ -78,6 +78,7 @@ func main() {
 	r.HandleFunc("/emptyCart", svc.emptyCartHandler).Methods(http.MethodPost)
 	r.HandleFunc("/addItemToOrder", svc.addToCartHandler).Methods(http.MethodPost)
 	r.HandleFunc("/checkout", svc.checkoutRequestHandler).Methods(http.MethodPost)
+	r.HandleFunc("/sendMail", svc.sendMailHandler).Methods(http.MethodPost)
 	var handler http.Handler = r
 
 	log.Infof("starting server on " + addr + ":" + srvPort)

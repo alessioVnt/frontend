@@ -5,7 +5,7 @@
   branch = "master"
   name = "github.com/alessioVnt/frontend"
   packages = ["pb"]
-  revision = "228d62341bacc5268c3d3b65c0de5c08699e9e9d"
+  revision = "2062e2e02cde4a8311c94b6366de7639101ee054"
 
 [[projects]]
   name = "github.com/golang/protobuf"

@@ -66,7 +66,20 @@ func (fe *frontendServer) addRestaurant(ctx context.Context, name string, city s
 
 func (fe *frontendServer) sendMail(ctx context.Context, tag string, id string) {
 	isSuccessful, err := pb.NewSdccMailServiceClient(fe.mailSvcConn).
-		SendMail(ctx, &pb.sen)
+		SendMail(ctx, &pb.SendMailRequest{
+			UserID: id,
+			Tag:    tag,
+		})
+
+	if err != nil {
+		print("Error in sending mail")
+		return
+	}
+	if isSuccessful.Ok {
+		print("Mail sent successfully")
+	} else {
+		print("Failed to send mail")
+	}
 }
 
 //Recommendation service handlers
