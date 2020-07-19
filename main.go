@@ -87,13 +87,15 @@ func main() {
 func mustMapEnv(target *string, envKey string) {
 	v := os.Getenv(envKey)
 	if v == "" {
-		// panic(fmt.Sprintf("environment variable %q not set", envKey))
+		//panic(fmt.Sprintf("environment variable %q not set", envKey))
 		//TEMPORANEO
 		if envKey == "RESTAURANT_SERVICE_ADDR" {
 			v = "localhost:50051"
 		}
 		if envKey == "USER_SERVICE_ADDR" {
 			//DA CONTROLLARE
+			v = "localhost:50051"
+		} else {
 			v = "localhost:50051"
 		}
 	}

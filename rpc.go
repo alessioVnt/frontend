@@ -64,22 +64,9 @@ func (fe *frontendServer) addRestaurant(ctx context.Context, name string, city s
 
 //Mail service handlers
 
-func (fe *frontendServer) getUserMail(ctx context.Context, id int32) string {
-	response, err := pb.NewSdccMailServiceClient(fe.mailSvcConn).
-		GetUserMail(ctx, &pb.IDMessage{
-			Id: id,
-		})
-
-	if err != nil {
-		print("error in getting user mail")
-		return ""
-	}
-
-	return response.Mail
-}
-
-func (fe *frontendServer) sendMail(ctx context.Context) {
-
+func (fe *frontendServer) sendMail(ctx context.Context, tag string, id string) {
+	isSuccessful, err := pb.NewSdccMailServiceClient(fe.mailSvcConn).
+		SendMail(ctx, &pb.sen)
 }
 
 //Recommendation service handlers
