@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"github.com/sirupsen/logrus"
 	"io"
 
 	pb "github.com/alessioVnt/frontend/pb"
@@ -16,6 +18,7 @@ func (fe *frontendServer) getUserByID(ctx context.Context, id int32) {
 		})
 	if err != nil {
 		print("Error in getting user")
+		logrus.Infof("" + fmt.Sprint(err) + "\n")
 		return
 	}
 	print("User found!" + "\n")
@@ -25,6 +28,24 @@ func (fe *frontendServer) getUserByID(ctx context.Context, id int32) {
 	print(userName + "\n")
 	print(userAddress + "\n")
 	print(userMail + "\n")
+}
+
+func (fe *frontendServer) updatePreferences(ctx context.Context, id int32, newPreference string) {
+	isSuccessfull, err := pb.NewSdccUserServiceClient(fe.userSvcConn).
+		UpdatePreferiti(ctx, &pb.UpdatePreferitiMessage{
+			Id:           id,
+			NewPreferito: newPreference,
+		})
+	if err != nil {
+		print("Error in updating user preferences\n")
+		return
+	}
+	if isSuccessfull.Ok {
+		print("User's preferences modified with success!")
+	} else {
+		print("User's preferences where not modified!")
+	}
+	return
 }
 
 //Restaurant service RPCs
@@ -62,6 +83,10 @@ func (fe *frontendServer) addRestaurant(ctx context.Context, name string, city s
 	print(response)
 }
 
+/*func (fe *frontendServer) modifyRestaurantMenu(ctx context.Context, id string, newMenu []*pb.RestaurantMenuItem) {
+	isSuccessful, err := pb.NewRestaurantServiceClient(fe.restaurantSvcConn).
+}*/
+
 //Mail service handlers
 
 func (fe *frontendServer) sendMail(ctx context.Context, tag string, id string) {
@@ -73,6 +98,7 @@ func (fe *frontendServer) sendMail(ctx context.Context, tag string, id string) {
 
 	if err != nil {
 		print("Error in sending mail")
+		logrus.Infof("" + fmt.Sprint(err) + "\n")
 		return
 	}
 	if isSuccessful.Ok {
@@ -92,6 +118,7 @@ func (fe *frontendServer) getRecommendations(ctx context.Context, id string) []s
 
 	if err != nil {
 		print("Error getting recommendations for user")
+		logrus.Infof("" + fmt.Sprint(err) + "\n")
 		return nil
 	}
 
@@ -112,6 +139,7 @@ func (fe *frontendServer) getOrder(ctx context.Context, id string) pb.Cart {
 
 	if err != nil {
 		print("error in getting user order")
+		logrus.Infof("" + fmt.Sprint(err) + "\n")
 		return pb.Cart{}
 	}
 
@@ -162,6 +190,7 @@ func (fe *frontendServer) executeCheckout(ctx context.Context, userID string, re
 
 	if err != nil {
 		print("Error in executing transaction \n")
+		logrus.Infof("" + fmt.Sprint(err) + "\n")
 		return false
 	}
 	return response.IsSuccessful

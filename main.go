@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -73,12 +74,14 @@ func main() {
 	r.HandleFunc("/restaurants", svc.restaurantListHandler).Methods(http.MethodGet, http.MethodHead)
 	r.HandleFunc("/addRestaurant", svc.addRestaurantHandler).Methods(http.MethodPost)
 	r.HandleFunc("/getUser", svc.getUserByIDHandler).Methods(http.MethodGet)
+	r.HandleFunc("/updatePreferences", svc.updateUserPreferencesHandler).Methods(http.MethodGet)
 	r.HandleFunc("/getRecommendations", svc.getRecommendationsHandler).Methods(http.MethodGet)
 	r.HandleFunc("/getOrder", svc.getOrderHandler).Methods(http.MethodGet)
 	r.HandleFunc("/emptyCart", svc.emptyCartHandler).Methods(http.MethodPost)
 	r.HandleFunc("/addItemToOrder", svc.addToCartHandler).Methods(http.MethodPost)
 	r.HandleFunc("/checkout", svc.checkoutRequestHandler).Methods(http.MethodPost)
 	r.HandleFunc("/sendMail", svc.sendMailHandler).Methods(http.MethodPost)
+	r.HandleFunc("/help", svc.helpPageHandler).Methods(http.MethodGet)
 	var handler http.Handler = r
 
 	log.Infof("starting server on " + addr + ":" + srvPort)
@@ -88,17 +91,7 @@ func main() {
 func mustMapEnv(target *string, envKey string) {
 	v := os.Getenv(envKey)
 	if v == "" {
-		//panic(fmt.Sprintf("environment variable %q not set", envKey))
-		//TEMPORANEO
-		if envKey == "RESTAURANT_SERVICE_ADDR" {
-			v = "localhost:50051"
-		}
-		if envKey == "USER_SERVICE_ADDR" {
-			//DA CONTROLLARE
-			v = "localhost:50051"
-		} else {
-			v = "localhost:50051"
-		}
+		panic(fmt.Sprintf("environment variable %q not set", envKey))
 	}
 	*target = v
 }
